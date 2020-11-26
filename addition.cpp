@@ -5,6 +5,9 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QPdfWriter>
+#include <QPageSize>
+#include <QPainter>
 
 #include "addition.h"
 
@@ -48,14 +51,21 @@ Addition_window::Addition_window(QWidget *parent):QWidget(parent)
 
 void Addition_window::create_pdf()
 {
-  QString fileName = QFileDialog::getSaveFileName(this,
+  QString filename = QFileDialog::getSaveFileName(this,
     tr("Save File"),
     "test.pdf",
     tr("Images (*.pdf)"));
 
-  QFile file(fileName);
-  file.open(QIODevice::WriteOnly);
-  file.write("Foo");
-  file.close();
+    QPdfWriter writer(filename);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+
+    QPainter painter(&writer);
+    painter.setPen(Qt::black);
+    painter.setFont(QFont("Times", 10));
+
+    QRect r = painter.viewport();
+    QString citydate = "test string";
+    painter.drawText(r, Qt::AlignLeft, citydate);
+    painter.end();
 
 }
