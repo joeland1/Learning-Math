@@ -6,9 +6,9 @@ class Addition_window : public QWidget {
 
   public:
     Addition_window(QWidget *parent = nullptr);
-    
-  private slots:
 
+  private slots:
+    void create_pdf();
   private:
 
 };

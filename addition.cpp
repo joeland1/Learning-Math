@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <QPushButton>
+#include <QFileDialog>
 
 #include "addition.h"
 
@@ -31,6 +32,8 @@ Addition_window::Addition_window(QWidget *parent):QWidget(parent)
   QCheckBox *answer_key = new QCheckBox("Create Answer Key");
   QPushButton *create = new QPushButton("Generate");
 
+  connect(create, &QPushButton::pressed, this, &Addition_window::create_pdf);
+
   decision->addWidget(new QLabel("Options"));
   decision->addWidget(worksheet);
   decision->addWidget(worksheet_even_answers);
@@ -41,4 +44,18 @@ Addition_window::Addition_window(QWidget *parent):QWidget(parent)
   overall_layout->addLayout(difficulty);
   overall_layout->addLayout(decision);
   setLayout(overall_layout);
+}
+
+void Addition_window::create_pdf()
+{
+  QString fileName = QFileDialog::getSaveFileName(this,
+    tr("Save File"),
+    "test.pdf",
+    tr("Images (*.pdf)"));
+
+  QFile file(fileName);
+  file.open(QIODevice::WriteOnly);
+  file.write("Foo");
+  file.close();
+
 }
