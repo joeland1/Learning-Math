@@ -72,68 +72,89 @@ void Addition_window::create_problem(int font_size, QPainter *painter)
   painter->drawText(1000,1000, "test string");
 }
 
-string Addition_window::calc_answer(string num1, string num2)
+string calc_answer(string string_numbers[], int length)
 {
-  //num1="123.123" num2="2"
-  // first index is numbers above decimal, second index is numbers right of  decimal
-  int num1_sides [2];
-  int num2_sides [2];
+  int array_length = length;
+  int num_sides[array_length][2];
 
-  std::size_t found = num1.find('.');
-  //found is the index
-  if (found != std::string::npos)
+  for (int i = 0; i < array_length; i++)
   {
-    num1_sides[0]=found;
-    num1_sides[1]=num1.length()-found-1;
-  }
-  else
-  {
-    num1_sides[0]=num1.length()-1;
-    num1_sides[1]=0;
-  }
-
-  found = num2.find('.');
-  if (found != std::string::npos)
-  {
-    num2_sides[0]=found;
-    num2_sides[1]=num2.length()-found-1;
-  }
-  else
-  {
-    num2_sides[0]=num2.length()-1;
-    num2_sides[1]=0;
+    std::size_t found = string_numbers[i].find ('.');
+    if (found != std::string::npos)
+  	{
+  	  num_sides[i][0] = found;
+  	  num_sides[i][1] = string_numbers[i].length () - found - 1;
+  	}
+    else
+  	{
+  	  num_sides[i][0] = string_numbers[i].length ();
+  	  num_sides[i][1] = 0;
+  	}
   }
 
-  while (num1_sides[0] != num2_sides[0])
+  int largest_left=-1;
+  int largest_right=-1;
+
+  for (int i = 0; i < array_length; i++)
+  {
+      if(num_sides[i][0]>largest_left)
+        largest_left=num_sides[i][0];
+      if(num_sides[i][1]>largest_right)
+        largest_right=num_sides[i][1];
+  }
+
+  for(int i=0; i<array_length;i++)
+  {
+    while(num_sides[i][0]<largest_left)
     {
-      if (num1_sides[0] > num2_sides[0])
-    	{
-    	  num2 = "0" + num2;
-    	  num2_sides[0]++;
-    	}
-      else
-    	{
-    	  num1 = "0" + num1;
-    	  num1_sides[0]++;
-    	}
+      string_numbers[i]="0"+string_numbers[i];
+      num_sides[i][0]++;
     }
-
-  while (num1_sides[1] != num2_sides[1])
+    while(num_sides[i][1]<largest_right)
     {
-      if (num1_sides[1] > num2_sides[1])
-    	{
-    	  num2 += "0";
-    	  num2_sides[1]++;
-    	}
-      else
-    	{
-    	  num1 += "0";
-    	  num1_sides[1]++;
-    	}
+      string_numbers[i]+="0";
+      num_sides[i][1]++;
     }
-  if (num1.length () > num2.length ())
-    num2.insert (num1_sides[0], ".");
-  else if (num1.length () < num2.length ())
-    num1.insert (num1_sides[0], ".");
+  }
 
+  for(int i=0;i<array_length;i++)
+  {
+    if(string_numbers[i].length()==1+largest_left+largest_right)
+      continue;
+    else
+      string_numbers[i].insert(num_sides[i][0],".");
+  }
+
+  string final = "";
+  int carry_over = 0;
+  for(int i=string_numbers[0].length()-1;i>=0;i--)
+  {
+    int total_for_place=0;
+    bool is_decimal=false;
+    for(int j=0;j<array_length;j++)
+    {
+      if(string_numbers[j][i]=='.')
+      {
+        is_decimal=true;
+        break;
+      }
+      else
+      {
+        total_for_place+=string_numbers[j][i]-'0';
+      }
+    }
+    if(is_decimal == true)
+        continue;
+    total_for_place+=carry_over%10;
+    carry_over/=10;
+    final.insert(0, to_string(total_for_place%10));
+    total_for_place/=10;
+    carry_over+=total_for_place;
+  }
+  if(carry_over!=0)
+    final=to_string(carry_over)+final;
+
+  if(largest_right!=0)
+    final.insert(largest_left, ".");
+  return final;
 }

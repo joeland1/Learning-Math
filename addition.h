@@ -12,5 +12,5 @@ class Addition_window : public QWidget {
     void create_pdf();
   private:
     void create_problem(int font_size, QPainter *painter);
-    string calc_answer(string num1, string num2);
+    string calc_answer(string string_numbers[], int length);
 };
