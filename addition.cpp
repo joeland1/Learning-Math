@@ -10,6 +10,8 @@
 #include <QPainter>
 #include <QMargins>
 #include <QPageLayout>
+#include <stdlib.h>
+#include <string>
 
 #include "addition.h"
 
@@ -69,10 +71,22 @@ void Addition_window::create_pdf()
 
 void Addition_window::create_problem(int font_size, QPainter *painter)
 {
-  painter->drawText(1000,1000, "test string");
+  srand((unsigned) time(0));
+  int ctr=rand() % 6;
+  std::string x [ctr];
+  std::string prob = "";
+  for(int i=0;i<ctr;i++)
+  {
+    x[i]=std::to_string(rand() % 6);
+    prob+=x[i]+"|";
+  }
+  prob+="=";
+  QString answer = calc_answer(x, sizeof(x)/sizeof(*x));
+  painter->drawText(100, 1000, QString::fromStdString(prob));
+  painter->drawText(600,1000, answer);
 }
 
-string calc_answer(string string_numbers[], int length)
+QString Addition_window::calc_answer(std::string string_numbers[], int length)
 {
   int array_length = length;
   int num_sides[array_length][2];
@@ -125,7 +139,7 @@ string calc_answer(string string_numbers[], int length)
       string_numbers[i].insert(num_sides[i][0],".");
   }
 
-  string final = "";
+  std::string final = "";
   int carry_over = 0;
   for(int i=string_numbers[0].length()-1;i>=0;i--)
   {
@@ -147,14 +161,15 @@ string calc_answer(string string_numbers[], int length)
         continue;
     total_for_place+=carry_over%10;
     carry_over/=10;
-    final.insert(0, to_string(total_for_place%10));
+    final.insert(0, std::to_string(total_for_place%10));
     total_for_place/=10;
     carry_over+=total_for_place;
   }
   if(carry_over!=0)
-    final=to_string(carry_over)+final;
+    final=std::to_string(carry_over)+final;
 
   if(largest_right!=0)
     final.insert(largest_left, ".");
-  return final;
+
+  return QString::fromStdString(final);
 }
