@@ -103,6 +103,37 @@ string Addition_window::calc_answer(string num1, string num2)
     num2_sides[0]=num2.length()-1;
     num2_sides[1]=0;
   }
-  
-  while()
+
+  while (num1_sides[0] != num2_sides[0])
+    {
+      if (num1_sides[0] > num2_sides[0])
+    	{
+    	  num2 = "0" + num2;
+    	  num2_sides[0]++;
+    	}
+      else
+    	{
+    	  num1 = "0" + num1;
+    	  num1_sides[0]++;
+    	}
+    }
+
+  while (num1_sides[1] != num2_sides[1])
+    {
+      if (num1_sides[1] > num2_sides[1])
+    	{
+    	  num2 += "0";
+    	  num2_sides[1]++;
+    	}
+      else
+    	{
+    	  num1 += "0";
+    	  num1_sides[1]++;
+    	}
+    }
+  if (num1.length () > num2.length ())
+    num2.insert (num1_sides[0], ".");
+  else if (num1.length () < num2.length ())
+    num1.insert (num1_sides[0], ".");
+
 }
