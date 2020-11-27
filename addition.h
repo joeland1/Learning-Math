@@ -1,4 +1,5 @@
 #include <QWidget>
+#include <QPainter>
 
 class Addition_window : public QWidget {
 
@@ -10,5 +11,6 @@ class Addition_window : public QWidget {
   private slots:
     void create_pdf();
   private:
-
+    void create_problem(int font_size, QPainter *painter);
+    string calc_answer(string num1, string num2);
 };
