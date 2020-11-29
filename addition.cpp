@@ -72,30 +72,29 @@ void Addition_window::create_pdf()
     QPointF start_point(1000,500);
     for(int question_count=50;question_count>0;question_count--)
     {
-      if(question_count==49)
-      {
-        std::vector<std::string> number_vector;
-        number_vector = generate_qa_pair(number_vector);
+      std::vector<std::string> number_vector;
+      number_vector = generate_qa_pair(number_vector);
 
+      if(question_count==50)
+      {
         QRectF problem_location=draw_problem(80, painter, start_point, number_vector);
         last_problem_pos=QPointF(problem_location.right()+start_point.x(), start_point.y());
         is_start=false;
       }
-      /*else
+      else
       {
-        std::string * numbers = generate_qa_pair();
-        QRectF last_problem_pending_area = calc_rect(80, painter, numbers);
+        QRectF last_problem_pending_area = calc_rect(80, painter, number_vector);
         QPointF last_problem_pending_point=QPointF(last_problem_pending_area.right()+last_problem_pos.x(), last_problem_pos.y());
         if(last_problem_pending_area.right()+last_problem_pos.x()>=painter->viewport().right())
         {
           last_problem_pending_point = QPointF(start_point.x(),last_problem_pos.y()+200);
-          QRectF answer_rect = draw_problem(80,painter,last_problem_pending_point, numbers);
+          QRectF answer_rect = draw_problem(80,painter,last_problem_pending_point, number_vector);
           last_problem_pending_point = QPointF(last_problem_pending_point.x()+answer_rect.right(), last_problem_pending_point.y());
         }
         else
-          draw_problem(80, painter, last_problem_pos, numbers);
+          draw_problem(80, painter, last_problem_pos, number_vector);
         last_problem_pos=last_problem_pending_point;
-      }*/
+      }
 
     }
     painter->end();
@@ -125,12 +124,14 @@ QRectF Addition_window::draw_problem(int font_size, QPainter *painter, QPointF l
   //painter->drawText(location, answer);
 }
 
-QRectF Addition_window::calc_rect(int font_size, QPainter *painter, std::string * numbers)
+QRectF Addition_window::calc_rect(int font_size, QPainter *painter, std::vector<std::string> numbers_inside_vector)
 {
+  int  length = numbers_inside_vector.size();
+  std::string numbers[length];
+  for(int i=0;i<length;i++)
+    numbers[i]=numbers_inside_vector.at(i);
+
   QString generated_problem="";
-  int  length = 0;
-  while (!numbers[length].empty())
-        ++length;
 
   for(int i=0;i<length;i++)
   {
