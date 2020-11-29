@@ -12,11 +12,14 @@ CONFIG += c++11 \
 SOURCES += \
     main.cpp \
     home.cpp \
-    addition.cpp
+    addition.cpp \
+    fraction.cpp \
+
 
 HEADERS += \
     home.h \
-    addition.h
+    addition.h \
+    fraction.h \
 
 FORMS +=
 
@@ -26,4 +29,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-  
