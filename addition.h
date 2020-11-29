@@ -1,6 +1,8 @@
 #include <QWidget>
 #include <QPainter>
-#include <QString>
+#include <QPointF>
+#include <QRect>
+#include <QStringList>
 
 class Addition_window : public QWidget {
 
@@ -12,6 +14,9 @@ class Addition_window : public QWidget {
   private slots:
     void create_pdf();
   private:
-    void create_problem(int font_size, QPainter *painter);
-    QString calc_answer(std::string string_numbers[], int length);
+    QRectF draw_problem(int font_size, QPainter *painter, QPointF location, std::vector<std::string> numbers_inside_vector);
+    QRectF calc_rect(int font_size, QPainter *painter, std::string numbers[]);
+    std::vector<std::string> generate_qa_pair(std::vector<std::string> question_destionation);
+    std::string calc_answer(std::string string_numbers[], int length);
+    QRectF calc_equation_rec(std::string numbers[]);
 };

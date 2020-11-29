@@ -11,12 +11,16 @@
 #include <QMargins>
 #include <QPageLayout>
 #include <stdlib.h>
-#include <string>
+#include <time.h>
+#include <QPointF>
+#include <QRectF>
+#include <QStringList>
 
 #include "addition.h"
 
 Addition_window::Addition_window(QWidget *parent):QWidget(parent)
 {
+  srand(time(0));
   QHBoxLayout *overall_layout= new QHBoxLayout();
   QVBoxLayout *difficulty = new QVBoxLayout();
 
@@ -63,30 +67,104 @@ void Addition_window::create_pdf()
     QPdfWriter *writer = new QPdfWriter(filename);
     QPainter *painter = new QPainter(writer);
 
-    painter->drawText(100,100, "string 1");
+    QPointF last_problem_pos;
+    bool is_start=true;
+    QPointF start_point(1000,500);
+    for(int question_count=50;question_count>0;question_count--)
+    {
+      if(question_count==49)
+      {
+        std::vector<std::string> number_vector;
+        number_vector = generate_qa_pair(number_vector);
 
-    create_problem(80, painter);
+        QRectF problem_location=draw_problem(80, painter, start_point, number_vector);
+        last_problem_pos=QPointF(problem_location.right()+start_point.x(), start_point.y());
+        is_start=false;
+      }
+      /*else
+      {
+        std::string * numbers = generate_qa_pair();
+        QRectF last_problem_pending_area = calc_rect(80, painter, numbers);
+        QPointF last_problem_pending_point=QPointF(last_problem_pending_area.right()+last_problem_pos.x(), last_problem_pos.y());
+        if(last_problem_pending_area.right()+last_problem_pos.x()>=painter->viewport().right())
+        {
+          last_problem_pending_point = QPointF(start_point.x(),last_problem_pos.y()+200);
+          QRectF answer_rect = draw_problem(80,painter,last_problem_pending_point, numbers);
+          last_problem_pending_point = QPointF(last_problem_pending_point.x()+answer_rect.right(), last_problem_pending_point.y());
+        }
+        else
+          draw_problem(80, painter, last_problem_pos, numbers);
+        last_problem_pos=last_problem_pending_point;
+      }*/
+
+    }
     painter->end();
 }
 
-void Addition_window::create_problem(int font_size, QPainter *painter)
+QRectF Addition_window::draw_problem(int font_size, QPainter *painter, QPointF location, std::vector<std::string> numbers_inside_vector)
 {
-  srand((unsigned) time(0));
-  int ctr=rand() % 6;
-  std::string x [ctr];
-  std::string prob = "";
-  for(int i=0;i<ctr;i++)
+  int  length = numbers_inside_vector.size();
+  std::string numbers[length];
+  for(int i=0;i<length;i++)
+    numbers[i]=numbers_inside_vector.at(i);
+
+  QString generated_problem="";
+
+  for(int i=0;i<length;i++)
   {
-    x[i]=std::to_string(rand() % 6);
-    prob+=x[i]+"|";
+    if(i==length-1)
+      generated_problem.append(QString::fromStdString(numbers[i]));
+    else if (i==length-2)
+      generated_problem.append(QString::fromStdString(numbers[i]+"="));
+    else
+      generated_problem.append(QString::fromStdString(numbers[i]+"+"));
   }
-  prob+="=";
-  QString answer = calc_answer(x, sizeof(x)/sizeof(*x));
-  painter->drawText(100, 1000, QString::fromStdString(prob));
-  painter->drawText(600,1000, answer);
+  QRectF area = painter->boundingRect(painter->viewport(), generated_problem+QString::fromStdString("\t\t\t\t"));
+  painter->drawText(location, generated_problem);
+  return area;
+  //painter->drawText(location, answer);
 }
 
-QString Addition_window::calc_answer(std::string string_numbers[], int length)
+QRectF Addition_window::calc_rect(int font_size, QPainter *painter, std::string * numbers)
+{
+  QString generated_problem="";
+  int  length = 0;
+  while (!numbers[length].empty())
+        ++length;
+
+  for(int i=0;i<length;i++)
+  {
+    if(i==length-1)
+      generated_problem.append(QString::fromStdString(numbers[i]));
+    else if (i==length-2)
+      generated_problem.append(QString::fromStdString(numbers[i]+"="));
+    else
+      generated_problem.append(QString::fromStdString(numbers[i]+"+"));
+  }
+  QRectF area = painter->boundingRect(painter->viewport(), generated_problem+QString::fromStdString("\t\t\t\t"));
+  return area;
+}
+
+std::vector<std::string> Addition_window::generate_qa_pair(std::vector<std::string> question_destionation) //last index is the solution
+{
+  int ctr=rand() % 6+2;
+  for(int i=0;i<=ctr;i++)
+  {
+    if(i==ctr)
+    {
+      std::string x[question_destionation.size()];
+      for(int i=0;i<question_destionation.size();i++)
+        x[i]=question_destionation.at(i);
+      question_destionation.push_back(calc_answer(x, sizeof(x)/sizeof(*x)));
+    }
+    else
+      question_destionation.push_back(std::to_string(rand() % 6+1));
+  }
+
+  return question_destionation;
+}
+
+std::string Addition_window::calc_answer(std::string string_numbers[], int length)
 {
   int array_length = length;
   int num_sides[array_length][2];
@@ -171,5 +249,5 @@ QString Addition_window::calc_answer(std::string string_numbers[], int length)
   if(largest_right!=0)
     final.insert(largest_left, ".");
 
-  return QString::fromStdString(final);
+  return final;
 }
