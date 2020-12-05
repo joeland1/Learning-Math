@@ -47,10 +47,74 @@ Fraction_window::Fraction_window(QWidget *parent):QWidget(parent)
 
 QList<QString> Fraction_window::convert_common_denom(QList<QString> fractions)
 {
-  // form in "123/2"
-  QList<QString> denominators;
+  // form in "123/2, 2/3"
+
+  QList<QString> simplified_terms;
   for(int i=0;i<fractions.size();i++)
-    denominators.append(fractions.split("/")[1]);
+    simplified_terms.append(reduce_frac(simplified_terms.get(i));
+
+  std::vector<std::vector<int>> factored_results;
+  for(int i=0;i<simplified_terms.size();i++)
+  {
+    int denominator = simplified_terms.split("/")[1].toInt();
+    while(denominator>1)
+    {
+      int lowest_factor=2;
+      if(denominator%lowest_factor==0)
+        factored_results.at(i).push_back(lowest_factor);
+      else
+        lowest_factor++;
+    }
+  }
+
+  /*
+  { {2,2,3}, {5}, {3,5,7,11} }
+  */
+
+  std::vector<int> final_lcm_factors;
+  for(int i=0;i<factored_results.at(0).size();i++)
+  {
+    int current_factor_testing=factored_results.at(0).at(i);
+    bool is_all_same = true;
+    for(int j=1;j<factored_results.size();j++)
+      for(int k=0;k<factored_results.at(j).size();k++)
+      {
+        if(current_factor_testing==factored_results.at(j).at(k))
+          break;
+        else if(j==factored_results.at(j).size())
+          is_all_same=false;
+        else
+          continue;
+      }
+
+
+    if(is_all_same==true)
+    {
+      int common_factor = factored_results.at(0).at(i);
+
+      factored_results.at(0).erase(i);
+      for(int j=1;j<factored_results.size();j++)
+      {
+        bool deleted_factor=false;
+        for(int k=0;deleted_factor==false;k++)
+        {
+          if(common_factor==factored_results.at(j).at(k))
+          {
+            deleted_factor=true;
+            factored_results.at(i).erase(k);
+          }
+        }
+      }
+    }
+  }
+
+  for(int i=0;i<factored_results.size();i++)
+    for(int j=0;j<factored_results.at(i).size();j++)
+      final_lcm_factors.push_back(factored_results.at(i).at(j));
+
+  int lcm=1;
+  for(int i=0;i<final_lcm_factors.size();i++)
+    lcm*=final_lcm_factors.at(i);
 }
 
 QString Fraction_window::reduce_frac(QString fraction)
@@ -80,5 +144,4 @@ QString Fraction_window::reduce_frac(QString fraction)
         gcf=numerator_factors.at(i);
   }
   return QString::fromStdString((split_frac[0]/gcf)+"/"+(split_frac[1]/gcf));
-
 }
