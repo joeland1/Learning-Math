@@ -32,6 +32,7 @@ Fraction_window::Fraction_window(QWidget *parent):QWidget(parent)
   QCheckBox *worksheet_odd_answers = new QCheckBox("Has odd answers");
   QCheckBox *answer_key = new QCheckBox("Create Answer Key");*/
   QPushButton *create = new QPushButton("Generate");
+  new QLabel(reduce_frac(QString("88/8")), this);
 
   decision->addWidget(new QLabel("Fraction"));
   /*decision->addWidget(worksheet);
@@ -51,12 +52,12 @@ QList<QString> Fraction_window::convert_common_denom(QList<QString> fractions)
 
   QList<QString> simplified_terms;
   for(int i=0;i<fractions.size();i++)
-    simplified_terms.append(reduce_frac(simplified_terms.get(i));
+    simplified_terms.append(reduce_frac(simplified_terms.at(i)));
 
   std::vector<std::vector<int>> factored_results;
   for(int i=0;i<simplified_terms.size();i++)
   {
-    int denominator = simplified_terms.split("/")[1].toInt();
+    int denominator = simplified_terms.at(i).split("/")[1].toInt();
     while(denominator>1)
     {
       int lowest_factor=2;
@@ -92,7 +93,7 @@ QList<QString> Fraction_window::convert_common_denom(QList<QString> fractions)
     {
       int common_factor = factored_results.at(0).at(i);
 
-      factored_results.at(0).erase(i);
+      factored_results.at(0).erase(factored_results.at(0).begin()+i);
       for(int j=1;j<factored_results.size();j++)
       {
         bool deleted_factor=false;
@@ -101,7 +102,7 @@ QList<QString> Fraction_window::convert_common_denom(QList<QString> fractions)
           if(common_factor==factored_results.at(j).at(k))
           {
             deleted_factor=true;
-            factored_results.at(i).erase(k);
+            factored_results.at(i).erase(factored_results.at(i).begin()+k);
           }
         }
       }
@@ -115,33 +116,46 @@ QList<QString> Fraction_window::convert_common_denom(QList<QString> fractions)
   int lcm=1;
   for(int i=0;i<final_lcm_factors.size();i++)
     lcm*=final_lcm_factors.at(i);
+
+  for(int i=0;i<simplified_terms.size();i++)
+  {
+    int multiplying_factor = lcm/simplified_terms.at(i).split("/")[1].toInt();
+    int new_numerator = multiplying_factor * simplified_terms.at(i).split("/")[0].toInt();
+    int new_demoninator = lcm;
+    fractions.replace(i,QString(new_numerator)+QString("/")+QString(lcm));
+  }
+  return fractions;
 }
 
 QString Fraction_window::reduce_frac(QString fraction)
 {
   //form in "122/2"
-  QString split_frac_pre = fraction.split("/");
-  int split_frac[2]={split_frac_pre[0].toInt(), split_frac_pre[1].toInt()};
+  QStringList split_frac_pre = fraction.split("/");
+  int split_frac[2]={split_frac_pre.value(0).toInt(), split_frac_pre.value(1).toInt()};
   //numerator is 0, denom is 1
   std::vector<int> numerator_factors;
-  for(int i=2;i<split_frac[0];i++)
-    if(split_frac%i==0)
+  for(int i=1;i<=split_frac[0];i++)
+    if(split_frac[0]%i==0)
       numerator_factors.push_back(i);
 
   std::vector<int> denominator_factors;
-  for(int i=2;i<split_frac[1];i++)
-    if(split_frac%i==0)
+  for(int i=1;i<=split_frac[1];i++)
+    if(split_frac[1]%i==0)
       denominator_factors.push_back(i);
 
-  if(numerator_factors.size()==0||denominator_factors.size()==0)
+  if((numerator_factors.size()==2||denominator_factors.size()==2)&&(split_frac[0]%split_frac[1]!=0))
     return fraction;
-
-  int gcf;
-  for(int i=numerator_factors.size();i>=0;i--)
+  else
   {
-    for(int j=denominator_factors.size();j>=0;j--)
-      if(numerator_factors.at(i)==denominator_factors.at(j))
-        gcf=numerator_factors.at(i);
+    int gcf=1;
+    for(int i=0;i<numerator_factors.size();i++)
+    {
+      for(int j=0;j<denominator_factors.size();j++)
+        if(numerator_factors.at(i)==denominator_factors.at(j))
+          gcf=numerator_factors.at(i);
+    }
+    if(split_frac[1]/gcf==1)
+      return QString::number(split_frac[0]/gcf);
+    return QString::number(split_frac[0]/gcf)+QString("/")+QString::number(split_frac[1]/gcf);
   }
-  return QString::fromStdString((split_frac[0]/gcf)+"/"+(split_frac[1]/gcf));
 }
